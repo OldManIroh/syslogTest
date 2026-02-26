@@ -3,7 +3,7 @@
 #include <time.h>
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
-#include "freertos/event_groups.h"
+#include "freertos/event_groups.h" 
 #include "esp_system.h"
 #include "esp_wifi.h"
 #include "esp_event.h"
@@ -22,7 +22,7 @@
 #define SYSLOG_SERVER_IP   "192.168.0.105"  // IP-адрес компьютера с syslog-сервером
 #define SYSLOG_PORT        514
 #define LOG_INTERVAL_SEC   10                // Интервал отправки (секунд)
-#define HOSTNAME           "esp32_wifi"      // Имя устройства в логах
+#define HOSTNAME           "esp32c6_wifi"      // Имя устройства в логах
 
 // === Идентификаторы событий ===
 #define WIFI_CONNECTED_BIT BIT0
@@ -169,7 +169,7 @@ static void send_syslog(const char *hostname, int facility, int severity, const 
 
     int sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
     if (sock < 0) {
-        ESP_LOGE(TAG, "Failed to create socket: errno %d", errno);
+        ESP_LOGE(TAG, "Ошибка создания сокета: errno %d", errno);
         return;
     }
 
@@ -180,9 +180,9 @@ static void send_syslog(const char *hostname, int facility, int severity, const 
 
     int err = sendto(sock, buffer, len, 0, (struct sockaddr *)&dest_addr, sizeof(dest_addr));
     if (err < 0) {
-        ESP_LOGE(TAG, "Error sending syslog: errno %d", errno);
+        ESP_LOGE(TAG, "Ошибка отправки syslog: errno %d", errno);
     } else {
-        ESP_LOGI(TAG, "Syslog sent (%d bytes): %s", len, buffer);
+        ESP_LOGI(TAG, "Syslog отправлен (%d байт): %s", len, buffer);
     }
 
     close(sock);
@@ -196,8 +196,8 @@ static void syslog_task(void *pvParameters)
     while (1) {
         counter++;
         char msg[64];
-        snprintf(msg, sizeof(msg), "Test syslog message #%d from ESP32 (WiFi)", counter);
-        send_syslog(hostname, 16, 6, "myapp", msg);
+        snprintf(msg, sizeof(msg), "Test syslog message #%d", counter);
+        send_syslog(hostname, 16, 6, "test_syslog", msg);
         vTaskDelay(pdMS_TO_TICKS(LOG_INTERVAL_SEC * 1000));
     }
 }
